@@ -8,8 +8,7 @@ const localStrategy = new LocalStrategy((username, password, done) => {
   User
     .findOne({ username })
     .then(results => {
-      user = results;  
-      console.log(user);  
+      user = results;   
         
       if (!user) {
         return Promise.reject({
@@ -38,4 +37,4 @@ const localStrategy = new LocalStrategy((username, password, done) => {
     });
 });
 
-module.exports = 'localStrategy';
+module.exports = localStrategy;
