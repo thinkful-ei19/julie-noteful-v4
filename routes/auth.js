@@ -15,3 +15,4 @@ router.post('/login', localAuth, function (req, res) {
 });
 
 
+module.exports = router;
