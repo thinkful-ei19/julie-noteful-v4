@@ -10,8 +10,9 @@ const Note = require('../models/note');
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/notes', (req, res, next) => {
   const { searchTerm, folderId, tagId } = req.query;
+  const userId = req.user.id;
 
-  let filter = {};
+  let filter = {userId};
 
   /**
    * BONUS CHALLENGE - Search both title and content using $OR Operator
@@ -30,6 +31,8 @@ router.get('/notes', (req, res, next) => {
   if (tagId) {
     filter.tags = tagId;
   }
+
+
 
   Note.find(filter)
     .populate('tags')
@@ -70,6 +73,7 @@ router.get('/notes/:id', (req, res, next) => {
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/notes', (req, res, next) => {
   const { title, content, folderId, tags } = req.body;
+  const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
   if (!title) {
@@ -88,7 +92,7 @@ router.post('/notes', (req, res, next) => {
     });
   }
 
-  const newItem = { title, content, folderId, tags };
+  const newItem = { title, content, folderId, tags, userId };
 
   Note.create(newItem)
     .then(result => {
@@ -103,6 +107,7 @@ router.post('/notes', (req, res, next) => {
 router.put('/notes/:id', (req, res, next) => {
   const { id } = req.params;
   const { title, content, folderId, tags } = req.body;
+  const userId = req.user.id;
 
   /***** Never trust users - validate input *****/
   if (!title) {
@@ -132,7 +137,7 @@ router.put('/notes/:id', (req, res, next) => {
   }
 
 
-  const updateItem = { title, content, tags };
+  const updateItem = { title, content, tags, userId };
   const options = { new: true };
 
   Note.findByIdAndUpdate(id, updateItem, options)
