@@ -76,6 +76,8 @@ router.post('/folders', (req, res, next) => {
 router.put('/folders/:id', (req, res, next) => {
   const { id } = req.params;
   const { name } = req.body;
+  const userId = req.user.id;
+  const updateFolder = { name, userId };
 
   /***** Never trust users - validate input *****/
   if (!name) {
@@ -90,7 +92,6 @@ router.put('/folders/:id', (req, res, next) => {
     return next(err);
   }
 
-  const updateFolder = { name };
 
   Folder.findByIdAndUpdate(id, updateFolder, { new: true })
     .then(result => {
@@ -112,19 +113,24 @@ router.put('/folders/:id', (req, res, next) => {
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/folders/:id', (req, res, next) => {
   const { id } = req.params;
+  const userId = req.user.id;
 
   // Manual "cascading" delete to ensure integrity
-  const folderRemovePromise = Folder.findByIdAndRemove({ _id: id });  // NOTE **underscore** _id
+  const folderRemovePromise = Folder.findOneAndRemove({ _id: id, userId });  // NOTE **underscore** _id
   // const noteRemovePromise = Note.deleteMany({ folderId: id });
 
   const noteRemovePromise = Note.updateMany(
-    { folderId: id },
+    { folderId: id, userId },
     { '$unset': { 'folderId': '' } }
   );
 
   Promise.all([folderRemovePromise, noteRemovePromise])
-    .then(() => {
-      res.status(204).end();
+    .then(result => {
+      if (result) {
+        res.status(204).end();
+      } else {
+        next();
+      }
     })
     .catch(err => {
       next(err);
