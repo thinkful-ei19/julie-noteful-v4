@@ -25,7 +25,7 @@ describe('Noteful API - Users', function () {
   });
 
   beforeEach(function () {
-    // noop
+    return User.ensureIndexes();
   });
 
   afterEach(function () {
@@ -128,7 +128,7 @@ describe('Noteful API - Users', function () {
         return chai.request(app).post('/api/users').send(testUser)
           .catch(err => err.response)
           .then(res => {
-            console.log('mrs. carter', res.body.message);
+            // console.log('mrs. carter', res.body.message);
             expect(res).to.have.status(422);
             expect(res.body.message).to.equal('Field: \'password\' cannot start or end with whitespace');
           });
@@ -168,8 +168,42 @@ describe('Noteful API - Users', function () {
       });
 
 
-      it.only('Should reject users with duplicate username');
-      it('Should trim fullname');
+      it.only('Should reject users with duplicate username', function() {
+        return User.create({
+          username: 'slay',
+          password,
+          fullname
+        })
+          .then(() => 
+            chai.request(app).post('/api/users').send({
+              username: 'slay',
+              password,
+              fullname
+            }))
+          .then(()=> expect.fail(null, null, 'Request should not succeed'))
+          .catch(err => {
+            if(err instanceof chai.AssertionError) {
+              throw err;
+            }
+            const res = err.response;
+            expect(res).to.have.status(400);
+            expect(res.body.message).to.equal('The username already exists');
+          }); 
+      });
+        
+
+    //   it.only('Should trim fullname', function() {
+    //     const testUser = {username, fullname: ' beyonce knowles carter ', password};
+    //     return chai.request(app).post('/api/users').send(testUser)
+    //       .catch(err => err.response)
+    //       .then(res => {
+    //         console.log('single ladies', res.body.message);
+    //         expect(res).to.have.status(201);
+    //         expect(res.body).to.be.an('object');
+    //         expect(res.body).to.have.keys('fullname');
+    //         expect(res.body.username).to.equal(username);
+    //       });
+    //   });
     });
 
     describe('GET', function () {
