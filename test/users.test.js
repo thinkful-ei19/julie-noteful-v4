@@ -101,19 +101,30 @@ describe('Noteful API - Users', function () {
           });
       });
 
-      it.only('Should reject users with non-string password', function() {
+      it('Should reject users with non-string password', function() {
         const testUser = {username, password:123, fullname};
         return chai.request(app).post('/api/users').send(testUser)
           .catch(err => err.response)
           .then(res => {
-            console.log('queen b', res.body.message);
+            // console.log('queen b', res.body.message);
             expect(res).to.have.status(422);
+            expect(res.body.message).to.equal('Field: \'password\' must be type String');
+          });
+      });
 
+      it.only('Should reject users with non-trimmed username', function() {
+        const testUser = {username: ' julie ' , password, fullname};
+        return chai.request(app).post('/api/users').send(testUser)
+          .catch(err => err.response)
+          .then(res => {
+            // console.log('beyonce', res.body.message);
+            expect(res).to.have.status(422);
+            expect(res.body.message).to.equal('Field: \'username\' cannot start or end with whitespace');
           });
       });
 
 
-      it('Should reject users with non-trimmed username');
+
       it('Should reject users with non-trimmed password');
       it('Should reject users with empty username');
       it('Should reject users with password less than 8 characters');

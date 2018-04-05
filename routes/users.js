@@ -34,7 +34,7 @@ router.post('/users', (req, res, next) => {
     return res.status(422).json({
       code: 422,
       reason: 'ValidationError',
-      message: 'Incorrect field type: expected string',
+      message: `Field: '${nonStringField}' must be type String`,
       location: nonStringField
     });
   }
@@ -45,13 +45,19 @@ router.post('/users', (req, res, next) => {
   );
 
   if (nonTrimmedField) {
-    return res.status(422).json({
-      code: 422,
-      reason: 'ValidationError',
-      message: 'Cannot start or end with whitespace',
-      location: nonTrimmedField
-    });
+    const err = new Error(`Field: '${nonTrimmedField}' cannot start or end with whitespace`);
+    err.status = 422;
+    return next(err);
   }
+
+  // if (nonTrimmedField) {
+  //   return res.status(422).json({
+  //     code: 422,
+  //     reason: 'ValidationError',
+  //     message: 'Cannot start or end with whitespace',
+  //     location: nonTrimmedField
+  //   });
+  // }
 
   const sizedFields = {
     username: {
@@ -63,13 +69,11 @@ router.post('/users', (req, res, next) => {
     }
   };
   const tooSmallField = Object.keys(sizedFields).find(
-    field =>
-      'min' in sizedFields[field] &&
+    field => 'min' in sizedFields[field] &&
             req.body[field].trim().length < sizedFields[field].min
   );
   const tooLargeField = Object.keys(sizedFields).find(
-    field =>
-      'max' in sizedFields[field] &&
+    field => 'max' in sizedFields[field] &&
             req.body[field].trim().length > sizedFields[field].max
   );
 
