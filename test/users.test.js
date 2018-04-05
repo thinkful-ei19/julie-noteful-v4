@@ -36,13 +36,13 @@ describe('Noteful API - Users', function () {
     return mongoose.disconnect();
   });
 
-  describe('/api/users', function () {
+  describe.only('/api/users', function () {
     describe('POST', function () {
       it('Should create a new user', function () {
         const testUser = { username, password, fullname };
 
         let res;
-        chai.request(app).post('/api/users').send(testUser)
+        return chai.request(app).post('/api/users').send(testUser)
           .then(_res => {
             res = _res;
             expect(res).to.have.status(201);
@@ -57,7 +57,7 @@ describe('Noteful API - Users', function () {
           })
           .then(user => {
             expect(user).to.exist;
-            expect(user._id).to.equal(res.body.id);
+            expect(user.id).to.equal(res.body.id);
             expect(user.fullname).to.equal(testUser.fullname);
             return user.validatePassword(password);
           })
@@ -84,7 +84,7 @@ describe('Noteful API - Users', function () {
         return chai.request(app).post('/api/users').send(testUser)
           .catch(err => err.response)
           .then(res => {
-            // console.log('yonce', res.body.location);
+            // console.log('yonce', res.body.message);
             expect(res).to.have.status(422); 
             expect(res.body.message).to.equal('Missing \'password\' in request body');
           });   
@@ -112,7 +112,7 @@ describe('Noteful API - Users', function () {
           });
       });
 
-      it.only('Should reject users with non-trimmed username', function() {
+      it('Should reject users with non-trimmed username', function() {
         const testUser = {username: ' julie ' , password, fullname};
         return chai.request(app).post('/api/users').send(testUser)
           .catch(err => err.response)
@@ -123,11 +123,30 @@ describe('Noteful API - Users', function () {
           });
       });
 
+      it('Should reject users with non-trimmed password', function() {
+        const testUser = {username, password: ' password ', fullname};
+        return chai.request(app).post('/api/users').send(testUser)
+          .catch(err => err.response)
+          .then(res => {
+            console.log('mrs. carter', res.body.message);
+            expect(res).to.have.status(422);
+            expect(res.body.message).to.equal('Field: \'password\' cannot start or end with whitespace');
+          });
+      });
+
+      it('Should reject users with empty username', function() {
+        const testUser = {username: '', password, fullname};
+        return chai.request(app).post('/api/users').send(testUser)
+          .catch(err => err.response)
+          .then(res => {
+            console.log('dark child', res.body.message);
+            expect(res).to.have.status(422);
+            expect(res.body.message).to.equal('Must be at least 1 characters long');
+          });
+      });
 
 
-      it('Should reject users with non-trimmed password');
-      it('Should reject users with empty username');
-      it('Should reject users with password less than 8 characters');
+      it.only('Should reject users with password less than 8 characters');
       it('Should reject users with password greater than 72 characters');
       it('Should reject users with duplicate username');
       it('Should trim fullname');
