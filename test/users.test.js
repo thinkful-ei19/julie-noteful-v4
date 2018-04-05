@@ -97,7 +97,7 @@ describe('Noteful API - Users', function () {
           .then(res => {
             // console.log('bey', res.body.message);
             expect(res).to.have.status(422);
-            expect(res.body.message).to.equal('Incorrect field type: expected string');
+            expect(res.body.message).to.equal('Field: \'username\' must be type String');
           });
       });
 
@@ -168,7 +168,7 @@ describe('Noteful API - Users', function () {
       });
 
 
-      it.only('Should reject users with duplicate username', function() {
+      it('Should reject users with duplicate username', function() {
         return User.create({
           username: 'slay',
           password,
@@ -192,18 +192,18 @@ describe('Noteful API - Users', function () {
       });
         
 
-    //   it.only('Should trim fullname', function() {
-    //     const testUser = {username, fullname: ' beyonce knowles carter ', password};
-    //     return chai.request(app).post('/api/users').send(testUser)
-    //       .catch(err => err.response)
-    //       .then(res => {
-    //         console.log('single ladies', res.body.message);
-    //         expect(res).to.have.status(201);
-    //         expect(res.body).to.be.an('object');
-    //         expect(res.body).to.have.keys('fullname');
-    //         expect(res.body.username).to.equal(username);
-    //       });
-    //   });
+      it('Should trim fullname', function() {
+        return chai.request(app).post('/api/users').send({
+          username, password, fullname: ' Example User '
+        })
+          .then (res => {
+            console.log(res.body.fullname);
+            expect(res).to.have.status(201);
+
+            expect(res.body.fullname).to.equal(fullname);
+            
+          });
+      });
     });
 
     describe('GET', function () {

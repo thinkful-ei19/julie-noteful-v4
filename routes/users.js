@@ -25,7 +25,7 @@ router.post('/users', (req, res, next) => {
     return next(err);
   }
 
-  const stringFields = ['username', 'password', 'firstName', 'lastName'];
+  const stringFields = ['username', 'password', 'fullname'];
   const nonStringField = stringFields.find(
     field => field in req.body && typeof req.body[field] !== 'string'
   );
@@ -49,6 +49,8 @@ router.post('/users', (req, res, next) => {
     err.status = 422;
     return next(err);
   }
+
+ 
 
   // if (nonTrimmedField) {
   //   return res.status(422).json({
@@ -118,7 +120,7 @@ router.post('/users', (req, res, next) => {
       const newUser = {
         username,
         password: digest,
-        fullname
+        fullname: fullname.trim()
       };
       return User.create(newUser);
     })
