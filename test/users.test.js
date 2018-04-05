@@ -139,14 +139,24 @@ describe('Noteful API - Users', function () {
         return chai.request(app).post('/api/users').send(testUser)
           .catch(err => err.response)
           .then(res => {
-            console.log('dark child', res.body.message);
+            // console.log('dark child', res.body.message);
             expect(res).to.have.status(422);
             expect(res.body.message).to.equal('Must be at least 1 characters long');
           });
       });
 
+      it.only('Should reject users with password less than 8 characters', function() {
+        const testUser = {username, password: 'asdfghj', fullname};
+        return chai.request(app).post('/api/users').send(testUser)
+          .catch(err => err.response)
+          .then(res => {
+            // console.log('formation', res.body.message);
+            expect(res).to.have.status(422);
+            expect(res.body.message).to.equal('Must be at least 8 characters long');
+          });
+      });
 
-      it.only('Should reject users with password less than 8 characters');
+
       it('Should reject users with password greater than 72 characters');
       it('Should reject users with duplicate username');
       it('Should trim fullname');
