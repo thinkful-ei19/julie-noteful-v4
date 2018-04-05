@@ -127,13 +127,21 @@ router.post('/notes', (req, res, next) => {
     
   }
 
-  Promise.all([verifyFolderId, verifyTagId])
+  Promise.all([verifyFolderId(userId, folderId), verifyTagId(userId, tags)])
     .then(() =>
       Note.create(newNote))
     .then(result => {
       res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })
     .catch(err => {
+      if(err === 'Folder is not valid') {
+        err = new Error ('Folder is not valid');
+        err.status = 400;
+      }
+      if (err === 'tag is not valid') {
+        err = new Error ('Tag is not valid');
+        err.status = 400;
+      }
       next(err);
     });
 });
@@ -203,7 +211,7 @@ router.put('/notes/:id', (req, res, next) => {
       
   }
   
-  Promise.all([verifyFolderId, verifyTagId])
+  Promise.all([verifyFolderId(userId, folderId), verifyTagId(userId, tags)])
     .then(() => {
       return Note.findByIdAndUpdate(id, updateItem, options)
         .populate('tags');})
@@ -215,6 +223,14 @@ router.put('/notes/:id', (req, res, next) => {
       }
     })
     .catch(err => {
+      if(err === 'Folder is not valid') {
+        err = new Error ('Folder is not valid');
+        err.status = 400;
+      }
+      if (err === 'tag is not valid') {
+        err = new Error ('Tag is not valid');
+        err.status = 400;
+      }
       next(err);
     });
 });
