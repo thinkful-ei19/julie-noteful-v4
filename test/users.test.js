@@ -145,7 +145,7 @@ describe('Noteful API - Users', function () {
           });
       });
 
-      it.only('Should reject users with password less than 8 characters', function() {
+      it('Should reject users with password less than 8 characters', function() {
         const testUser = {username, password: 'asdfghj', fullname};
         return chai.request(app).post('/api/users').send(testUser)
           .catch(err => err.response)
@@ -156,9 +156,19 @@ describe('Noteful API - Users', function () {
           });
       });
 
+      it('Should reject users with password greater than 72 characters', function() {
+        const testUser = {username, fullname, password: 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'};
+        return chai.request(app).post('/api/users').send(testUser)
+          .catch(err => err.response)
+          .then(res => {
+            // console.log('drunk in love', res.body.message);
+            expect(res).to.have.status(422);
+            expect(res.body.message).to.equal('Must be at most 72 characters long');
+          });
+      });
 
-      it('Should reject users with password greater than 72 characters');
-      it('Should reject users with duplicate username');
+
+      it.only('Should reject users with duplicate username');
       it('Should trim fullname');
     });
 
