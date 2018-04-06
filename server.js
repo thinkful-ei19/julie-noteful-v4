@@ -21,9 +21,9 @@ const authRouter = require('./routes/auth');
 const app = express();
 
 // Log all requests. Skip logging during
-app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'common', {
-  skip: () => process.env.NODE_ENV === 'test'
-}));
+// app.use(morgan(process.env.NODE_ENV === 'development' ? 'dev' : 'common', {
+//   skip: () => process.env.NODE_ENV === 'test'
+// }));
 
 // Utilize the Express static webserver, passing in the directory name
 app.use(express.static('public'));
