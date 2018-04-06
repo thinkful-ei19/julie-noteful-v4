@@ -143,9 +143,9 @@ describe('Noteful API - Folders', function () {
 
   });
 
-  describe.only('POST /api/folders', function () {
+  describe('POST /api/folders', function () {
 
-    it.only('should create and return a new item when provided valid data', function () {
+    it('should create and return a new item when provided valid data', function () {
       const newItem = {
         'name': 'newFolder',
       };
@@ -153,13 +153,14 @@ describe('Noteful API - Folders', function () {
       return chai.request(app)
         .post('/api/folders')
         .send(newItem)
+        .set('Authorization', `Bearer ${token}`)
         .then(function (res) {
           body = res.body;
           expect(res).to.have.status(201);
           expect(res).to.have.header('location');
           expect(res).to.be.json;
           expect(body).to.be.a('object');
-          expect(body).to.include.keys('id', 'name');
+          expect(body).to.include.keys('id', 'name', 'userId');
           return Folder.findById(body.id);
         })
         .then(data => {
@@ -176,6 +177,7 @@ describe('Noteful API - Folders', function () {
       return chai.request(app)
         .post('/api/folders')
         .send(newItem)
+        .set('Authorization', `Bearer ${token}`)
         .catch(err => err.response)
         .then(res => {
           expect(res).to.have.status(400);
@@ -190,7 +192,9 @@ describe('Noteful API - Folders', function () {
       return Folder.findOne().select('id name')
         .then(data => {
           const newItem = { 'name': data.name };
-          return chai.request(app).post('/api/folders').send(newItem);
+          return chai.request(app).post('/api/folders')
+            .send(newItem)
+            .set('Authorization', `Bearer ${token}`);
         })
         .catch(err => err.response)
         .then(res => {
@@ -203,9 +207,9 @@ describe('Noteful API - Folders', function () {
 
   });
 
-  describe('PUT /api/folders/:id', function () {
+  describe.only('PUT /api/folders/:id', function () {
 
-    it('should update the folder', function () {
+    it.only('should update the folder', function () {
       const updateItem = {
         'name': 'Updated Name'
       };
@@ -215,7 +219,8 @@ describe('Noteful API - Folders', function () {
           data = _data;
           return chai.request(app)
             .put(`/api/folders/${data.id}`)
-            .send(updateItem);
+            .send(updateItem)
+            .set('Authorization', `Bearer ${token}`);
         })
         .then(function (res) {
           expect(res).to.have.status(200);
