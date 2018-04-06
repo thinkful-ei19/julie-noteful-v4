@@ -195,9 +195,9 @@ describe('Noteful API - Tags', function () {
 
   });
 
-  describe.only('PUT /api/tags/:id', function () {
+  describe('PUT /api/tags/:id', function () {
 
-    it.only('should update the tag', function () {
+    it('should update the tag', function () {
       const updateItem = {
         'name': 'Updated Name'
       };
@@ -207,7 +207,8 @@ describe('Noteful API - Tags', function () {
           data = _data;
           return chai.request(app)
             .put(`/api/tags/${data.id}`)
-            .send(updateItem);
+            .send(updateItem)
+            .set('Authorization', `Bearer ${token}`);
         })
         .then(function (res) {
           expect(res).to.have.status(200);
@@ -230,6 +231,7 @@ describe('Noteful API - Tags', function () {
       return chai.request(app)
         .put(`/api/tags/${badId}`)
         .send(updateItem)
+        .set('Authorization', `Bearer ${token}`)
         .catch(err => err.response)
         .then(res => {
           expect(res).to.have.status(400);
@@ -245,6 +247,7 @@ describe('Noteful API - Tags', function () {
       return chai.request(app)
         .put('/api/tags/AAAAAAAAAAAAAAAAAAAAAAAA')
         .send(updateItem)
+        .set('Authorization', `Bearer ${token}`)
         .catch(err => err.response)
         .then(res => {
           expect(res).to.have.status(404);
@@ -259,6 +262,7 @@ describe('Noteful API - Tags', function () {
       return chai.request(app)
         .put('/api/tags/9999')
         .send(updateItem)
+        .set('Authorization', `Bearer ${token}`)
         .catch(err => err.response)
         .then(res => {
           expect(res).to.have.status(400);
@@ -274,7 +278,7 @@ describe('Noteful API - Tags', function () {
         .then(results => {
           const [item1, item2] = results;
           item1.name = item2.name;
-          return chai.request(app).put(`/api/tags/${item1.id}`).send(item1);
+          return chai.request(app).put(`/api/tags/${item1.id}`).send(item1).set('Authorization', `Bearer ${token}`);
         })
         .catch(err => err.response)
         .then(res => {
