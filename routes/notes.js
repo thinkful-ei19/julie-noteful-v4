@@ -38,7 +38,7 @@ router.get('/notes', (req, res, next) => {
     filter.tags = tagId;
   }
 
-
+ 
 
   Note.find(filter)
     .populate('tags')
