@@ -50,7 +50,7 @@ describe('Noteful API - Tags', function () {
 
   describe.only('GET /api/tags', function () {
 
-    it.only('should return the correct number of tags', function () {
+    it('should return the correct number of tags', function () {
       const dbPromise = Tag.find({ userId: user.id });
       const apiPromise = chai.request(app).get('/api/tags')
         .set('Authorization', `Bearer ${token}`); 
@@ -65,8 +65,9 @@ describe('Noteful API - Tags', function () {
     });
 
     it('should return a list with the correct right fields', function () {
-      const dbPromise = Tag.find();
-      const apiPromise = chai.request(app).get('/api/tags');
+      const dbPromise = Tag.find({ userId: user.id });
+      const apiPromise = chai.request(app).get('/api/tags')
+        .set('Authorization', `Bearer ${token}`); 
 
       return Promise.all([dbPromise, apiPromise])
         .then(([data, res]) => {
@@ -76,7 +77,7 @@ describe('Noteful API - Tags', function () {
           expect(res.body).to.have.length(data.length);
           res.body.forEach(function (item) {
             expect(item).to.be.a('object');
-            expect(item).to.have.keys('id', 'name');
+            expect(item).to.have.keys('id', 'name', 'userId');
           });
         });
     });
