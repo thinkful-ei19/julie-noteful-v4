@@ -37,17 +37,7 @@ describe('Noteful API - Folders', function () {
         ]);
       });
   });
-  // beforeEach(function () {
-  //   return Promise.all([
-  //     User.insertMany(seedUsers),
-  //     Folder.insertMany(seedFolders),
-  //     Folder.ensureIndexes(),
 
-  //   ]).then(([users])=> {
-  //     user = users[0];
-  //     token = jwt.sign({user}, JWT_SECRET, {subject: user.username});
-  //   });
-  // });
 
   afterEach(function () {
     return mongoose.connection.db.dropDatabase();
@@ -303,9 +293,9 @@ describe('Noteful API - Folders', function () {
 
   });
 
-  describe.only('DELETE /api/folders/:id', function () {
+  describe('DELETE /api/folders/:id', function () {
 
-    it.only('should delete an item by id', function () {
+    it('should delete an item by id', function () {
       return Folder.findOne({userId: user.id}).select('id name')
         .then(data => {
           return chai.request(app).delete(`/api/folders/${data.id}`).set('Authorization', `Bearer ${token}`);
