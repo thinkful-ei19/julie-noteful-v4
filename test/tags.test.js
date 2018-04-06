@@ -48,7 +48,7 @@ describe('Noteful API - Tags', function () {
     return mongoose.disconnect();
   });
 
-  describe.only('GET /api/tags', function () {
+  describe('GET /api/tags', function () {
 
     it('should return the correct number of tags', function () {
       const dbPromise = Tag.find({ userId: user.id });
@@ -88,17 +88,17 @@ describe('Noteful API - Tags', function () {
 
     it('should return correct tags', function () {
       let data;
-      return Tag.findOne().select('id name')
+      return Tag.findOne({ userId: user.id }).select('id name')
         .then(_data => {
           data = _data;
-          return chai.request(app).get(`/api/tags/${data.id}`);
+          return chai.request(app).get(`/api/tags/${data.id}`).set('Authorization', `Bearer ${token}`); 
         })
         .then((res) => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
 
           expect(res.body).to.be.an('object');
-          expect(res.body).to.have.keys('id', 'name');
+          expect(res.body).to.have.keys('id', 'name', 'userId');
 
           expect(res.body.id).to.equal(data.id);
           expect(res.body.name).to.equal(data.name);
@@ -110,6 +110,7 @@ describe('Noteful API - Tags', function () {
 
       return chai.request(app)
         .get(`/api/tags/${badId}`)
+        .set('Authorization', `Bearer ${token}`)
         .catch(err => err.response)
         .then(res => {
           expect(res).to.have.status(400);
@@ -121,6 +122,7 @@ describe('Noteful API - Tags', function () {
 
       return chai.request(app)
         .get('/api/tags/AAAAAAAAAAAAAAAAAAAAAAAA')
+        .set('Authorization', `Bearer ${token}`)
         .catch(err => err.response)
         .then(res => {
           expect(res).to.have.status(404);
