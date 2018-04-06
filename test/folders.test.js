@@ -207,7 +207,7 @@ describe('Noteful API - Folders', function () {
 
   });
 
-  describe.only('PUT /api/folders/:id', function () {
+  describe('PUT /api/folders/:id', function () {
 
     it('should update the folder', function () {
       const updateItem = {
@@ -284,7 +284,7 @@ describe('Noteful API - Folders', function () {
         });
     });
 
-    it.only('should return an error when given a duplicate name', function () {
+    it('should return an error when given a duplicate name', function () {
 
       return Folder.find().select('id name').limit(2)
         .then(results => {
@@ -303,12 +303,12 @@ describe('Noteful API - Folders', function () {
 
   });
 
-  describe('DELETE /api/folders/:id', function () {
+  describe.only('DELETE /api/folders/:id', function () {
 
-    it('should delete an item by id', function () {
-      return Folder.findOne().select('id name')
+    it.only('should delete an item by id', function () {
+      return Folder.findOne({userId: user.id}).select('id name')
         .then(data => {
-          return chai.request(app).delete(`/api/folders/${data.id}`);
+          return chai.request(app).delete(`/api/folders/${data.id}`).set('Authorization', `Bearer ${token}`);
         })
         .then((res) => {
           expect(res).to.have.status(204);
