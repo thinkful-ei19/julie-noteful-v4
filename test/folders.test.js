@@ -209,7 +209,7 @@ describe('Noteful API - Folders', function () {
 
   describe.only('PUT /api/folders/:id', function () {
 
-    it.only('should update the folder', function () {
+    it('should update the folder', function () {
       const updateItem = {
         'name': 'Updated Name'
       };
@@ -243,6 +243,7 @@ describe('Noteful API - Folders', function () {
       return chai.request(app)
         .put(`/api/folders/${badId}`)
         .send(updateItem)
+        .set('Authorization', `Bearer ${token}`)
         .catch(err => err.response)
         .then(res => {
           expect(res).to.have.status(400);
@@ -258,6 +259,7 @@ describe('Noteful API - Folders', function () {
       return chai.request(app)
         .put('/api/folders/AAAAAAAAAAAAAAAAAAAAAAAA')
         .send(updateItem)
+        .set('Authorization', `Bearer ${token}`)
         .catch(err => err.response)
         .then(res => {
           expect(res).to.have.status(404);
@@ -272,6 +274,7 @@ describe('Noteful API - Folders', function () {
       return chai.request(app)
         .put('/api/folders/9999')
         .send(updateItem)
+        .set('Authorization', `Bearer ${token}`)
         .catch(err => err.response)
         .then(res => {
           expect(res).to.have.status(400);
@@ -281,13 +284,13 @@ describe('Noteful API - Folders', function () {
         });
     });
 
-    it('should return an error when given a duplicate name', function () {
+    it.only('should return an error when given a duplicate name', function () {
 
       return Folder.find().select('id name').limit(2)
         .then(results => {
           const [item1, item2] = results;
           item1.name = item2.name;
-          return chai.request(app).put(`/api/folders/${item1.id}`).send(item1);
+          return chai.request(app).put(`/api/folders/${item1.id}`).send(item1).set('Authorization', `Bearer ${token}`);
         })
         .catch(err => err.response)
         .then(res => {
