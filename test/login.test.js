@@ -43,7 +43,7 @@ describe.only('Noteful API - Login', function() {
   });
 
   describe('Noteful /api/login', function() {
-    it.only('Should return a valid auth token', function() {
+    it('Should return a valid auth token', function() {
       return chai.request(app).post('/api/login').send({username: 'user0', password: 'password'})
         .then(res => {
           expect(res).to.have.status(200);
@@ -56,6 +56,14 @@ describe.only('Noteful API - Login', function() {
             'fullname': 'User Zero',
             'username': 'user0',
           });
+        });
+    });
+
+    it.only('Should reject requests with no credentials', function() {
+      return chai.request(app).post('/api/login').send()
+        .catch(err=> err.response)
+        .then(res=> {
+          expect(res).to.have.status(400);
         });
     });
   });
