@@ -2,11 +2,14 @@
 
 const express = require('express');
 const router = express.Router();
-
+const passport = require('passport');
 const mongoose = require('mongoose');
 
 const Folder = require('../models/folder');
 const Note = require('../models/note');
+
+// Endpoints below this require a valid JWT
+router.use(passport.authenticate('jwt', { session: false, failWithError: true }));
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/folders', (req, res, next) => {
