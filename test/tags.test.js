@@ -141,6 +141,7 @@ describe('Noteful API - Tags', function () {
       return chai.request(app)
         .post('/api/tags')
         .send(newItem)
+        .set('Authorization', `Bearer ${token}`)
         .then(function (res) {
           body = res.body;
           expect(res).to.have.status(201);
@@ -164,6 +165,7 @@ describe('Noteful API - Tags', function () {
       return chai.request(app)
         .post('/api/tags')
         .send(newItem)
+        .set('Authorization', `Bearer ${token}`)
         .catch(err => err.response)
         .then(res => {
           expect(res).to.have.status(400);
@@ -178,7 +180,9 @@ describe('Noteful API - Tags', function () {
       return Tag.findOne().select('id name')
         .then(data => {
           const newItem = { 'name': data.name };
-          return chai.request(app).post('/api/tags').send(newItem);
+          return chai.request(app).post('/api/tags')
+            .send(newItem)
+            .set('Authorization', `Bearer ${token}`);
         })
         .catch(err => err.response)
         .then(res => {
@@ -191,9 +195,9 @@ describe('Noteful API - Tags', function () {
 
   });
 
-  describe('PUT /api/tags/:id', function () {
+  describe.only('PUT /api/tags/:id', function () {
 
-    it('should update the tag', function () {
+    it.only('should update the tag', function () {
       const updateItem = {
         'name': 'Updated Name'
       };
