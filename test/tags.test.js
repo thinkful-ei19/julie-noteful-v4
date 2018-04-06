@@ -294,9 +294,9 @@ describe('Noteful API - Tags', function () {
   describe('DELETE /api/tags/:id', function () {
 
     it('should delete an item by id', function () {
-      return Tag.findOne().select('id name')
+      return Tag.findOne({ userId: user.id }).select('id name')
         .then(data => {
-          return chai.request(app).delete(`/api/tags/${data.id}`);
+          return chai.request(app).delete(`/api/tags/${data.id}`).set('Authorization', `Bearer ${token}`);
         })
         .then((res) => {
           expect(res).to.have.status(204);
