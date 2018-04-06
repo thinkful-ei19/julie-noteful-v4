@@ -3,26 +3,38 @@ const app = require('../server');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
-const { TEST_MONGODB_URI } = require('../config');
+const { JWT_SECRET, TEST_MONGODB_URI } = require('../config');
 
+const User = require('../models/user');
 const Folder = require('../models/folder');
 const seedFolders = require('../db/seed/folders');
-
+const seedUsers = require('../models/user');
 
 const expect = chai.expect;
 
 chai.use(chaiHttp);
 
 describe('Noteful API - Folders', function () {
+  let user = {};
+  let token;
+
   before(function () {
     return mongoose.connect(TEST_MONGODB_URI)
       .then(() => mongoose.connection.db.dropDatabase());
   });
 
   beforeEach(function () {
-    return Folder.insertMany(seedFolders)
-      .then(() => Folder.ensureIndexes());
+    return Promise.all([
+      User.insertMany(seedUsers),
+      Folder.insertMany(seedFolders),
+      Folder.ensureIndexes(),
+
+    ]).then(([users])=> {
+      user = users[0];
+      token = jwt.sign({user}, JWT_SECRET, {subject: user.username});
+    });
   });
 
   afterEach(function () {
@@ -33,9 +45,8 @@ describe('Noteful API - Folders', function () {
     return mongoose.disconnect();
   });
 
-  describe('GET /api/folders', function () {
-
-    it('should return the correct number of folders', function () {
+  describe.only('GET /api/folders', function () {
+    it.only('should return the correct number of folders', function () {
       const dbPromise = Folder.find();
       const apiPromise = chai.request(app).get('/api/folders');
 

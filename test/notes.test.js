@@ -3,29 +3,47 @@ const app = require('../server');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
-const { TEST_MONGODB_URI } = require('../config');
+const { JWT_SECRET, TEST_MONGODB_URI } = require('../config'); 
 
+const User = require('../models/user');
 const Note = require('../models/note');
 const Folder = require('../models/folder');
+const Tag = require('../models/tag');
+const seedUsers = require('../db/seed/users');
 const seedNotes = require('../db/seed/notes');
 const seedFolders = require('../db/seed/folders');
+const seedTags = require('../db/seed/tags');
 
 const expect = chai.expect;
 
 chai.use(chaiHttp);
 
 describe('Noteful API - Notes', function () {
+  let user = {};
+  let token;
+
   before(function () {
     return mongoose.connect(TEST_MONGODB_URI)
       .then(() => mongoose.connection.db.dropDatabase());
   });
 
-  beforeEach(function () {
-    const noteInsertPromise = Note.insertMany(seedNotes);
-    const folderInsertPromise = Folder.insertMany(seedFolders);
-    return Promise.all([noteInsertPromise, folderInsertPromise])
-      .then(() => Note.ensureIndexes());
+  beforeEach(function () { 
+    return Promise.all([
+      User.insertMany(seedUsers),
+      User.ensureIndexes(),
+      Note.insertMany(seedNotes),
+      Folder.insertMany(seedFolders),
+      Folder.ensureIndexes(),
+      Tag.insertMany(seedTags),
+      Tag.ensureIndexes()
+    ])
+      .then(([users]) => {
+        user = users[0];
+        token = jwt.sign({user}, JWT_SECRET, {subject:user.username});
+      });
+
   });
 
   afterEach(function () {

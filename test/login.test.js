@@ -21,7 +21,7 @@ chai.use(chaiHttp);
 // const username = 'exampleUser';
 // const password = 'examplePass';
 
-describe.only('Noteful API - Login', function() {
+describe('Noteful API - Login', function() {
 
   before(function() {
     return mongoose.connect(TEST_MONGODB_URI)
@@ -59,7 +59,7 @@ describe.only('Noteful API - Login', function() {
         });
     });
 
-    it.only('Should reject requests with no credentials', function() {
+    it('Should reject requests with no credentials', function() {
       return chai.request(app).post('/api/login').send()
         .catch(err=> err.response)
         .then(res=> {
