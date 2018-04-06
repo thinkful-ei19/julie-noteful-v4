@@ -4,9 +4,8 @@ const app = require('../server');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
 
-const { TEST_MONGODB_URI } = require('../config'); ('../config');
+const { TEST_MONGODB_URI } = require('../config'); 
 
 const User = require('../models/user');
 
@@ -36,7 +35,7 @@ describe('Noteful API - Users', function () {
     return mongoose.disconnect();
   });
 
-  describe.only('/api/users', function () {
+  describe('/api/users', function () {
     describe('POST', function () {
       it('Should create a new user', function () {
         const testUser = { username, password, fullname };
